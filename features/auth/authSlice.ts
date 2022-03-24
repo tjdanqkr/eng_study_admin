@@ -1,12 +1,18 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createSlice,
+  isRejectedWithValue,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 
-import type { AppState, AppThunk } from '../../app/store';
-import { fetchLogin } from './authApi';
+import type { AppState, AppThunk } from "../../app/store";
+import { saveToken } from "../../lib/token";
+import { fetchLogin } from "./authApi";
 
 export interface AuthState {
   id: string;
   name: string;
-  status: 'idle' | 'loading' | 'failed';
+  status: "idle" | "loading" | "failed";
   token: string;
   rejectMessage: string;
 }
@@ -17,55 +23,54 @@ export interface user {
 }
 
 const initialState: AuthState = {
-  id: '',
-  name: '',
-  status: 'idle',
-  token: '',
-  rejectMessage: '',
+  id: "",
+  name: "",
+  status: "idle",
+  token: "",
+  rejectMessage: "",
 };
 export interface userInfomation {
-  name: '';
-  token: '';
+  name: "";
+  token: "";
 }
 
 export const LoginAsync = createAsyncThunk(
-  'login/signin',
-  async (user: user) => {
+  "login/signin",
+  async (user: user, { rejectWithValue }) => {
     const response = await fetchLogin(user);
-    return response.data;
-  },
+    console.log(response);
+    if (response.status === 201) {
+      saveToken(response.data.accessToken);
+      return response.data.name;
+    } else {
+      return rejectWithValue("Login fail");
+    }
+  }
 );
 
 export const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
 
-  reducers: {
-    loginAction: (state, action: PayloadAction<userInfomation>) => {
-      state.token = action.payload.token;
-      state.name = action.payload.name;
-    },
-  },
+  reducers: {},
 
   extraReducers: (builder) => {
     builder
       .addCase(LoginAsync.pending, (state) => {
-        state.status = 'loading';
-        state.rejectMessage = '';
+        state.status = "loading";
+        state.rejectMessage = "";
       })
       .addCase(LoginAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.token = action.payload.token;
-        state.name = action.payload.name;
-        state.rejectMessage = '';
+        state.status = "idle";
+        state.name = action.payload;
+        state.rejectMessage = "";
       })
       .addCase(LoginAsync.rejected, (state) => {
-        state.rejectMessage = 'Login fail';
+        state.status = "failed";
+        state.rejectMessage = "Login fail";
       });
   },
 });
-
-export const { loginAction } = authSlice.actions;
 
 export const selectToken = (state: AppState) => state.auth.token;
 export const selectRejectMessage = (state: AppState) =>

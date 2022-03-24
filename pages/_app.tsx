@@ -1,10 +1,10 @@
-import { AppProps } from 'next/app';
-import { env } from 'process';
-import { Provider } from 'react-redux';
-import store, { wrapper } from '../app/store';
-import '../styles/index.css';
-import { ThemeProvider } from 'next-themes';
-import DarkModeButton from '../components/darkMode-button';
+import { AppProps } from "next/app";
+import { env } from "process";
+import { Provider } from "react-redux";
+import store, { wrapper } from "../app/store";
+import "../styles/index.css";
+import { ThemeProvider } from "next-themes";
+import DarkModeButton from "../components/darkMode-button";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
