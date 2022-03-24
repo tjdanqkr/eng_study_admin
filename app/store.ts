@@ -11,10 +11,21 @@ import counterReducer, { CounterState } from "../features/counter/counterSlice";
 import authReducer, { InitialAuthState } from "../features/auth/authSlice";
 import { createWrapper, HYDRATE } from "next-redux-wrapper";
 import logger from "redux-logger";
+import categoryReducer, {
+  CategoryInitialState,
+} from "../features/category/categorySlice";
+import questionReducer, {
+  QuestionInitialState,
+} from "../features/question/questionSlice";
 
 const reducer = (
   state:
-    | CombinedState<{ counter: CounterState; auth: InitialAuthState }>
+    | CombinedState<{
+        counter: CounterState;
+        auth: InitialAuthState;
+        category: CategoryInitialState;
+        question: QuestionInitialState;
+      }>
     | undefined,
   action: AnyAction
 ) => {
@@ -24,6 +35,8 @@ const reducer = (
   return combineReducers({
     counter: counterReducer, // 여기에 추가
     auth: authReducer,
+    category: categoryReducer,
+    question: questionReducer,
   })(state, action);
 };
 
