@@ -1,34 +1,49 @@
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { LoginAsync } from '../features/auth/authSlice';
-import MiniAlert from './miniAlert';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { LoginAsync } from "../features/auth/authSlice";
+import { checkToken, getToken } from "../lib/token";
+import MiniAlert from "./miniAlert";
 
 const Login = () => {
   const dispatch = useAppDispatch();
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const rejectMessage = useAppSelector((state) => state.auth.rejectMessage);
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const { rejectMessage } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    checkToken()
+      .then((res) => {
+        if (res) {
+          router.replace("main");
+        }
+      })
+      .catch((err) => null);
+  }, []);
+
   useEffect(() => {
     if (rejectMessage) callAlert(rejectMessage);
   }, [rejectMessage]);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!id || !password) {
-      callAlert('Empty');
+      callAlert("Empty");
       return;
     }
-    dispatch(LoginAsync({ id, password }));
+    await dispatch(LoginAsync({ id, password }));
+    await router.replace("main");
   };
 
   const callAlert = (text: string) => {
     setMessage(text);
     setTimeout(() => {
-      setMessage('');
+      setMessage("");
     }, 1000);
   };
   const onEnterAction = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') onSubmit();
+    if (e.key === "Enter") onSubmit();
   };
   return (
     <section className="flex-col font-sans">
@@ -40,13 +55,13 @@ const Login = () => {
           <p>Username</p>
           <input
             className="border-[none] border-b border-b-white bg-transparent outline-none"
-            type={'text'}
+            type={"text"}
             placeholder="Id"
             onChange={(e) => setId(e.target.value)}
           ></input>
           <p>Password</p>
           <input
-            type={'password'}
+            type={"password"}
             placeholder="Password"
             className="border-[none] border-b border-b-white bg-transparent outline-none"
             onChange={(e) => setPassword(e.target.value)}
@@ -55,9 +70,9 @@ const Login = () => {
             }}
           ></input>
           <input
-            type={'button'}
+            type={"button"}
             className="border-[none] outline-none bg-[#db2525] text-[#fff] text-xl rounded-xl p-3 hover:bg-[#4ecdff] hover:text-[#000]"
-            value={'Login'}
+            value={"Login"}
             onClick={() => {
               onSubmit();
             }}

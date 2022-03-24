@@ -1,19 +1,13 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isRejectedWithValue,
-  PayloadAction,
-} from "@reduxjs/toolkit";
-
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AppState, AppThunk } from "../../app/store";
-import { saveToken } from "../../lib/token";
+import { getToken, saveToken } from "../../lib/token";
 import { fetchLogin } from "./authApi";
 
 export interface AuthState {
   id: string;
   name: string;
   status: "idle" | "loading" | "failed";
-  token: string;
+  token: string | null | undefined;
   rejectMessage: string;
 }
 
@@ -25,8 +19,8 @@ export interface user {
 const initialState: AuthState = {
   id: "",
   name: "",
-  status: "idle",
-  token: "",
+  status: "loading",
+  token: getToken(),
   rejectMessage: "",
 };
 export interface userInfomation {

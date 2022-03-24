@@ -13,7 +13,7 @@ export const customAxios = async (method: method, url: url, data?: data) => {
     data,
     headers: {
       "Context-type": "application/json",
-      Authorization: `Baerer ${getToken()}`,
+      Authorization: `Bearer ${getToken()}`,
     },
   };
   const result = await axios(config);

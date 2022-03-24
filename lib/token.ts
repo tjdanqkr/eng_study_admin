@@ -1,3 +1,5 @@
+import { customAxios } from "./customAxios";
+
 const TOKEN = "token";
 
 export const saveToken = (token: string) => {
@@ -9,5 +11,11 @@ export const clearToken = () => {
 
 export const getToken = () => {
   const ISSERVER = typeof window === "undefined";
-  if (!ISSERVER) localStorage.getItem(TOKEN);
+  if (!ISSERVER) return localStorage.getItem(TOKEN);
+  return;
+};
+export const checkToken = async () => {
+  const response = await customAxios("GET", "/auth/adminme");
+  if (response.status === 200) return true;
+  return false;
 };
