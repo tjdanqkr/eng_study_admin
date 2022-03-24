@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AppState, AppThunk } from "../../app/store";
 import { getToken, saveToken } from "../../lib/token";
-import { fetchLogin } from "./authApi";
+import { getAllUser, login } from "./authApi";
 
 export interface AuthState {
   id: string;
@@ -11,28 +11,59 @@ export interface AuthState {
   rejectMessage: string;
 }
 
-export interface user {
+export interface User {
+  id: string;
+  name: string;
+  phoneNum: number;
+  isAdmin: boolean;
+  endTime: string;
+  startTime: string;
+  middleCategory: number;
+  bigCategory: number;
+}
+export interface UserState {
+  user: {
+    id: string;
+    name: string;
+    phoneNum: number;
+    isAdmin: boolean;
+    endTime: string;
+    startTime: string;
+    middleCategory: number;
+    bigCategory: number;
+  }[];
+  status: "idle" | "loading" | "failed";
+}
+export interface InitialAuthState {
+  auth: AuthState;
+  user: UserState;
+}
+
+export interface SignIn {
   id: string;
   password: string;
 }
 
-const initialState: AuthState = {
-  id: "",
-  name: "",
-  status: "loading",
-  token: getToken(),
-  rejectMessage: "",
+const initialState: InitialAuthState = {
+  auth: {
+    id: "",
+    name: "",
+    status: "loading",
+    token: getToken(),
+    rejectMessage: "",
+  },
+  user: { user: [], status: "loading" },
 };
+
 export interface userInfomation {
   name: "";
   token: "";
 }
 
 export const LoginAsync = createAsyncThunk(
-  "login/signin",
-  async (user: user, { rejectWithValue }) => {
-    const response = await fetchLogin(user);
-    console.log(response);
+  "auth/signin",
+  async (signin: SignIn, { rejectWithValue }) => {
+    const response = await login(signin);
     if (response.status === 201) {
       saveToken(response.data.accessToken);
       return response.data.name;
@@ -41,6 +72,11 @@ export const LoginAsync = createAsyncThunk(
     }
   }
 );
+
+export const getAllUserAsync = createAsyncThunk("auth/allUser", async () => {
+  const response = await getAllUser();
+  return response.data;
+});
 
 export const authSlice = createSlice({
   name: "auth",
@@ -51,23 +87,34 @@ export const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(LoginAsync.pending, (state) => {
-        state.status = "loading";
-        state.rejectMessage = "";
+        state.auth.status = "loading";
+        state.auth.rejectMessage = "";
       })
       .addCase(LoginAsync.fulfilled, (state, action) => {
-        state.status = "idle";
-        state.name = action.payload;
-        state.rejectMessage = "";
+        state.auth.status = "idle";
+        state.auth.name = action.payload;
+        state.auth.rejectMessage = "";
       })
       .addCase(LoginAsync.rejected, (state) => {
-        state.status = "failed";
-        state.rejectMessage = "Login fail";
+        state.auth.status = "failed";
+        state.auth.rejectMessage = "Login fail";
+      })
+      .addCase(getAllUserAsync.pending, (state) => {
+        state.user.status = "loading";
+      })
+      .addCase(getAllUserAsync.fulfilled, (state, action) => {
+        state.user.status = "idle";
+
+        state.user.user = action.payload;
+      })
+      .addCase(getAllUserAsync.rejected, (state) => {
+        state.user.status = "failed";
       });
   },
 });
 
-export const selectToken = (state: AppState) => state.auth.token;
+export const selectToken = (state: AppState) => state.auth.auth.token;
 export const selectRejectMessage = (state: AppState) =>
-  state.auth.rejectMessage;
+  state.auth.auth.rejectMessage;
 
 export default authSlice.reducer;

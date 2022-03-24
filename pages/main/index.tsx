@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 import MainUI from "../../components/mainUI";
+import MainContent from "../../components/mainContent";
 const Index = () => {
   const router = useRouter();
 
@@ -29,7 +30,9 @@ const Index = () => {
           <title>main</title>
         </Head>
         <Container>
-          <MainUI></MainUI>
+          <MainUI>
+            <MainContent></MainContent>
+          </MainUI>
         </Container>
       </Layout>
     </>

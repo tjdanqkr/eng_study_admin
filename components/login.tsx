@@ -10,7 +10,7 @@ const Login = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { rejectMessage } = useAppSelector((state) => state.auth);
+  const { rejectMessage } = useAppSelector((state) => state.auth.auth);
   const router = useRouter();
 
   useEffect(() => {
