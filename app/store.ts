@@ -5,18 +5,18 @@ import {
   combineReducers,
   AnyAction,
   CombinedState,
-} from "@reduxjs/toolkit";
+} from '@reduxjs/toolkit';
 
-import counterReducer, { CounterState } from "../features/counter/counterSlice";
-import authReducer, { InitialAuthState } from "../features/auth/authSlice";
-import { createWrapper, HYDRATE } from "next-redux-wrapper";
-import logger from "redux-logger";
+import counterReducer, { CounterState } from '../features/counter/counterSlice';
+import authReducer, { InitialAuthState } from '../features/auth/authSlice';
+import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+import logger from 'redux-logger';
 import categoryReducer, {
   CategoryInitialState,
-} from "../features/category/categorySlice";
+} from '../features/category/categorySlice';
 import questionReducer, {
   QuestionInitialState,
-} from "../features/question/questionSlice";
+} from '../features/question/questionSlice';
 
 const reducer = (
   state:
@@ -27,7 +27,7 @@ const reducer = (
         question: QuestionInitialState;
       }>
     | undefined,
-  action: AnyAction
+  action: AnyAction,
 ) => {
   if (action.type === HYDRATE) {
     return { ...state, ...action.payload };
@@ -44,7 +44,7 @@ export function makeStore() {
   return configureStore({
     reducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
-    devTools: process.env.NODE_ENV !== "production",
+    devTools: process.env.NODE_ENV !== 'production',
   });
 }
 
@@ -61,7 +61,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 export const wrapper = createWrapper(makeStore, {
-  debug: process.env.NODE_ENV !== "production",
+  debug: process.env.NODE_ENV !== 'production',
 });
 
 export default store;
